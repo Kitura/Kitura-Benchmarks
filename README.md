@@ -5,7 +5,9 @@
 
 ## Summary
 
-Kitura-Benchmarks is a collection of benchmarks for Kitura. Work in progress. 🚧
+Kitura-Benchmarks is a collection of performance benchmarks for Kitura. Work in progress. 🚧
+
+This includes a copy of the Blog and JSON benchmarks originally published by [Ryan Collins: https://github.com/rymcol/Linux-Server-Side-Swift-Benchmarking](https://github.com/rymcol/Linux-Server-Side-Swift-Benchmarking), Kitura component benchmarks for Core (Logging, SSL, Middleware, JSON, Codable), SwiftMetrics, and TechEmpower benchmarks using different database connectors.
 
 ## Community
 
