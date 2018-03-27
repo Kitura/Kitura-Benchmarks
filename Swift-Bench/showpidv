@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# 1st number is procs_running
+# 2nd number is the number of threads in the monitored process
+# 3rd number is the number of threads in monitored process that are running
+# 4th number is the number of threads in monitored process in sleeping state
+#   (eg. semaphore, blocking I/O)
+#
+
+  MPID=$1
+
+  echo "monitoring process ${MYPID}"
+  echo "procs_running #threads #running #sleeping"
+  cd /proc/${MPID}/task
+
+  while true; do
+    numt=`ls -1 | wc -l`
+    pr=`grep procs_running /proc/stat | cut -d' ' -f2`
+    echo -n "${pr}, ${numt}"
+    for f in *; do grep State $f/status ; done | cut -c8 | awk '{a[$0]++}; END {printf(", %2d, %2d\n", a["R"], a["S"]);}'
+    sleep 1;
+    [[ ! -e /proc/${MPID} ]] && break
+  done
