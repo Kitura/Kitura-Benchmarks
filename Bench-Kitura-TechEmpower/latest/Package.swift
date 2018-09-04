@@ -5,12 +5,6 @@ import PackageDescription
 
 let package = Package(
     name: "Kitura-Bench-TechEmpower",
-    products: [
-        // Products define the executables and libraries produced by a package, and make them visible to other packages.
-        .library(
-            name: "Kitura-Bench-TechEmpower",
-            targets: ["TechEmpowerCouch", "TechEmpowerKuery", "TechEmpowerKueryPostgres", "TechEmpowerKueryMustache", "TechEmpowerMongoKitten"]),
-    ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
@@ -19,8 +13,8 @@ let package = Package(
         .package(url: "https://github.com/IBM-Swift/Configuration.git", from: "3.0.0"),
         .package(url: "https://github.com/IBM-Swift/Kitura-CouchDB.git", from: "2.0.0"),
         .package(url: "https://github.com/IBM-Swift/Swift-Kuery-PostgreSQL", from: "1.0.0"),
-        .package(url: "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git", from: "1.8.0"),
-        .package(url: "https://github.com/IBM-Swift/Kitura-MustacheTemplateEngine.git", from: "1.7.2"),
+        .package(url: "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git", from: "1.10.0"),
+        .package(url: "https://github.com/IBM-Swift/Kitura-MustacheTemplateEngine.git", from: "1.8.0"),
         .package(url: "https://github.com/OpenKitten/MongoKitten.git", from: "4.0.0"),
     ],
     targets: [

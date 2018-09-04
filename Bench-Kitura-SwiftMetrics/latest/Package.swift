@@ -5,12 +5,6 @@ import PackageDescription
 
 let package = Package(
     name: "Bench-Kitura-SwiftMetrics",
-    products: [
-        // Products define the executables and libraries produced by a package, and make them visible to other packages.
-        .library(
-            name: "Bench-Kitura-SwiftMetrics",
-            targets: ["HelloWorld", "HelloWorldSwiftMetrics", "HelloWorldSwiftMetricsHTTP"]),
-    ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
