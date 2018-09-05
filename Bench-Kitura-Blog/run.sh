@@ -43,6 +43,9 @@ function setParams {
 # Keep track of return code from successive benchmark runs
 rc=0
 
+# Allow 'verify' flag to be passed in
+BENCHMARK_MODE="$1"
+
 # Create a derectory to hold the benchmark results, renaming an existing directory
 # if one exists
 preserveDir results
