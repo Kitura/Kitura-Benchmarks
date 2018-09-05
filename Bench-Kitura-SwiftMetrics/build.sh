@@ -9,23 +9,8 @@ set -e
 # Location of this script
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Get dependencies from Swift-Bench project
-if [ ! -d "$dir/bench" ]; then
-  pushd $dir > /dev/null
-  git clone https://github.com/djones6/Swift-Bench.git bench
-  popd > /dev/null
-fi
-
-# Change to a specific commit / tag, if SCRIPTS_VERSION is set
-if [ ! -z "$SCRIPTS_VERSION" ]; then
-  pushd $dir/bench > /dev/null
-  git fetch
-  git checkout $SCRIPTS_VERSION
-  popd > /dev/null
-fi
-
 # Import functions from submodule
-. $dir/bench/lib/build.sh
+. $dir/../Bench-Swift/lib/build.sh
 
 # Baseline version of project to compare with. This should match a branch
 # of name baseline-<version>

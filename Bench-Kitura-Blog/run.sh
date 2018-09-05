@@ -7,11 +7,11 @@
 # Location of this script
 dir=$($(cd `dirname $0`) && pwd)
 
-. $dir/bench/lib/bench.sh
-. $dir/bench/lib/build.sh
+. $dir/../Bench-Swift/lib/bench.sh
+. $dir/../Bench-Swift/lib/build.sh
 
 # Define functions required to execute benchmarks
-# (see: bench/lib/bench.sh)
+# (see: Bench-Swift/lib/bench.sh)
 
 function setParams {
     local TESTNAME="$1"
