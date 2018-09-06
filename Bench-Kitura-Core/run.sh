@@ -5,7 +5,7 @@
 #
 
 # Location of this script
-dir=$($(cd `dirname $0`) && pwd)
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 . $dir/../Bench-Swift/lib/bench.sh
 . $dir/../Bench-Swift/lib/build.sh
