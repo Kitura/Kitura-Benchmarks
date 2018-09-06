@@ -28,10 +28,13 @@ matrix:
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install bc libhttp-date-perl clang libicu-dev libcurl4-openssl-dev libssl-dev libpython2.7; fi
   - git clone https://github.com/kylef/swiftenv.git ~/.swiftenv && export SWIFTENV_ROOT="$HOME/.swiftenv" && export PATH="$SWIFTENV_ROOT/bin:$PATH" && eval "$(swiftenv init -)"
-  - git clone https://github.com/djones6/wrk -b interval && cd wrk && make && export PATH="$PWD:$PATH"
+  - git clone https://github.com/djones6/wrk -b interval && cd wrk && make > build.out && export PATH="$PWD:$PATH" && cd ..
 
 # Attempt to build each test suite, run (functional) verification
 script:
   - ./Bench-Kitura-Core/build.sh
   - ./Bench-Kitura-Core/run.sh verify
+  - ./Bench-Kitura-TechEmpower/build.sh
+  - ./Bench-Kitura-SwiftMetrics/build.sh
+  - ./Bench-Kitura-Blog/build.sh
 
