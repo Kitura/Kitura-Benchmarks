@@ -33,7 +33,7 @@ before_install:
   - git clone https://github.com/kylef/swiftenv.git ~/.swiftenv && export SWIFTENV_ROOT="$HOME/.swiftenv" && export PATH="$SWIFTENV_ROOT/bin:$PATH" && eval "$(swiftenv init -)"
   - git clone https://github.com/djones6/wrk -b interval && cd wrk && make > build.out && export PATH="$PWD:$PATH" && cd ..
   - git clone https://github.com/apache/jmeter.git -b v2_13 && export PATH="$PWD/jmeter/bin:$PATH" 
-  - if [[ -n "$SWIFT_VERSION" ]]; then swiftenv install $SWIFT_VERSION; fi
+  - if [[ -n "$SWIFT_VERSION" ]]; then swiftenv install $SWIFT_VERSION -s; fi
 
 # Attempt to build each test suite, run (functional) verification
 script:
