@@ -30,6 +30,7 @@ function setParams {
     HelloSSLHandshake)
       IMPLEMENTATION="HelloSSL"
       URL="https://localhost:8443/plaintext"
+      CLIENTS=20
       PRE_RUN_SCRIPT="$dir/scripts/ssl_setup.sh"
       DRIVER="wrk-nokeepalive"
       ;;
