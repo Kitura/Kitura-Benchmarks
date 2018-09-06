@@ -4,33 +4,33 @@ branches:
     - travis
     - /^issue.*$/
 
-# the matrix of builds should cover each combination of Swift version
+# The matrix of builds should cover each combination of Swift version
 # and platform that is supported. The version of Swift used is specified
-# by .swift-version, unless SWIFT_SNAPSHOT is specified.
+# by .swift-version, unless SWIFT_VERSION is specified.
 matrix:
   include:
     - os: linux
       dist: trusty
       sudo: required
-      env: SWIFT_SNAPSHOT=4.0.3
+      env: SWIFT_VERSION=4.0.3
     - os: linux
       dist: trusty
       sudo: required
-      env: SWIFT_SNAPSHOT=4.1.2
     - os: osx
       osx_image: xcode9.2
       sudo: required
-      env: SWIFT_SNAPSHOT=4.0.3
+      env: SWIFT_VERSION=4.0.3
     - os: osx
       osx_image: xcode9.4
       sudo: required
-      env: SWIFT_SNAPSHOT=4.1.2
 
+# Install prereqs (linux deps, swiftenv, wrk)
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install bc libhttp-date-perl clang libicu-dev libcurl4-openssl-dev libssl-dev libpython2.7; fi
   - git clone https://github.com/kylef/swiftenv.git ~/.swiftenv && export SWIFTENV_ROOT="$HOME/.swiftenv" && export PATH="$SWIFTENV_ROOT/bin:$PATH" && eval "$(swiftenv init -)"
   - git clone https://github.com/djones6/wrk -b interval && cd wrk && make && export PATH="$PWD:$PATH"
 
+# Attempt to build each test suite, run (functional) verification
 script:
   - ./Bench-Kitura-Core/build.sh
   - ./Bench-Kitura-Core/run.sh verify
