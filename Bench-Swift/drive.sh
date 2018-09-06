@@ -75,19 +75,9 @@ OSX_DISABLE_FIREWALL=yes   # Disable OSX firewall during test? (requires sudo)
 SUPPORTED_OSES="Linux Darwin"
 
 # Customize this section appropriately for your hardware
-case `uname` in
-Linux)
-  DRIVER_AFFINITY="numactl --cpunodebind=1 --membind=1"
-  APP_AFFINITY="numactl --physcpubind=$CPULIST --membind=0"
-  WORK_THREADS=16
-  ;;
-Darwin)
-  # Don't know if this is possible on OS X...
-  DRIVER_AFFINITY=""
-  APP_AFFINITY=""
-  WORK_THREADS=4
-  ;;
-esac
+DRIVER_AFFINITY=""
+APP_AFFINITY=""
+WORK_THREADS=4
 
 # Check this OS is supported
 if [[ ! $SUPPORTED_OSES =~ `uname` ]]; then
@@ -118,6 +108,12 @@ fi
 
 # Determine location of this script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Create a file named <hostname>_setup to enable host-based customization
+if [ -e "$SCRIPT_DIR/`hostname`_setup" ]; then
+  echo "Using customization for host `hostname`"
+  source $SCRIPT_DIR/`hostname`_setup
+fi
 
 # Consume cmdline args (simplest possible implementation for now)
 if [ -z "$1" -o "$1" == "--help" ]; then
