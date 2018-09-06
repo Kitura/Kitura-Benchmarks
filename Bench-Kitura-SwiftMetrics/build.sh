@@ -9,8 +9,9 @@ set -e
 # Location of this script
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Import functions from submodule
-. $dir/../Bench-Swift/lib/build.sh
+# Import functions from common benchmarking scripts
+ln -sf $dir/../Bench-Swift $dir/bench
+. $dir/bench/lib/build.sh
 
 # Baseline version of project to compare with. This should match a branch
 # of name baseline-<version>

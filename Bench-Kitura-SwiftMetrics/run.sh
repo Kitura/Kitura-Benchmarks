@@ -5,10 +5,12 @@
 #
 
 # Location of this script
-dir=$($(cd `dirname $0`) && pwd)
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-. $dir/../Bench-Swift/lib/bench.sh
-. $dir/../Bench-Swift/lib/build.sh
+# Import functions from common benchmarking scripts
+ln -sf $dir/../Bench-Swift $dir/bench
+. $dir/bench/lib/bench.sh
+. $dir/bench/lib/build.sh
 
 # Define functions required to execute benchmarks
 # (see: Bench-Swift/lib/bench.sh)
@@ -75,6 +77,9 @@ rc=0
 
 # Allow 'verify' flag to be passed in
 BENCHMARK_MODE="$1"
+
+# Ensure results are created in the project directory
+cd $dir
 
 # Create a derectory to hold the benchmark results, renaming an existing directory
 # if one exists
