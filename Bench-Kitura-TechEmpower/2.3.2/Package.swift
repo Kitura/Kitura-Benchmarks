@@ -41,7 +41,7 @@ var dependencies: [Package.Dependency] = [
     .package(url: "https://github.com/kylef/PathKit.git", .exact("0.9.1")),
 
     // depends on PathKit, Spectre
-    .package(url: "https://github.com/kylef/Stencil", .exact("0.11.0")),
+    .package(url: "https://github.com/kylef/Stencil.git", .exact("0.11.0")),
 
     // depends on Kitura-TemplateEngine, Stencil
     .package(url: "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git", .exact("1.9.1")),
