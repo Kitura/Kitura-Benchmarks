@@ -35,6 +35,7 @@ function executeTest {
     if [ "$BENCHMARK_MODE" == "verify" ]; then
 	ITERATIONS=1
 	DURATION=10
+	CLIENTS=4
     fi
 
     # Set up environment for driver scripts
