@@ -29,7 +29,7 @@ fi
 
 # Baseline version of project to compare with. This should match a branch
 # of name baseline-<version>
-DEFAULT_BASE_VERSION="1.7.9"
+DEFAULT_BASE_VERSION="2.3.2"
 if [ -z "$BASE_VERSION" ]; then
   echo "Using default baseline version: $DEFAULT_BASE_VERSION"
   BASE_VERSION="$DEFAULT_BASE_VERSION"

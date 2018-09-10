@@ -115,6 +115,18 @@ function setParams {
       URL="http://localhost:8080/postHello"
       WRK_SCRIPT="$dir/payloads/simpleStructPayload.lua"
       ;;
+    CodableRoutingGetAccept)
+      IMPLEMENTATION="CodableRouting"
+      URL="http://localhost:8080/getHelloId/123"
+      # Add an Accept header to trigger Media Type processing
+      WRK_SCRIPT="$dir/payloads/get_accept.lua"
+      ;;
+    CodableRoutingPostAccept)
+      IMPLEMENTATION="CodableRouting"
+      URL="http://localhost:8080/postHello"
+      # Add an Accept header to trigger Media Type processing
+      WRK_SCRIPT="$dir/payloads/simpleStructPayload_accept.lua"
+      ;;
     *)
       echo "Unknown test '$TESTNAME'"
       ;;
