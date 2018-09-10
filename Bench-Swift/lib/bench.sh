@@ -31,13 +31,6 @@ function executeTest {
     # Override with benchmark-specific values 
     setParams $TESTNAME
 
-    # Override ITERATIONS and DURATION if we're in verify mode
-    if [ "$BENCHMARK_MODE" == "verify" ]; then
-	ITERATIONS=1
-	DURATION=10
-	CLIENTS=4
-    fi
-
     # Set up environment for driver scripts
     export URL CLIENTS DURATION ITERATIONS DRIVER INTERVAL VERBOSE_TRACE JSONFILE WRK_SCRIPT JMETER_SCRIPT WORK_RATE RUNNAME PRE_RUN_SCRIPT CLIENT
 

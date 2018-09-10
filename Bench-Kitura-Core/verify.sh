@@ -31,36 +31,17 @@ cd $dir
 preserveDir results
 
 # Simple tests
-executeTest "HelloWorld"
-executeTest "HelloLogging"
-
-# JSON serialization and parsing
-executeTest "JSONDouble"
-executeTest "JSONParsing"
+verifyTest "HelloWorld"
 
 # Codable tests (requires a Swift 4 baseline)
-#executeTest "JSONEncoderDouble"
-#executeTest "JSONDecoderDouble"
-#executeTest "JSONEncoderSmallStruct"
-#executeTest "JSONDecoderSmallStruct"
-#executeTest "CodableRoutingGet"
-#executeTest "CodableRoutingPost"
+verifyTest "CodableRoutingGet"
+verifyTest "CodableRoutingPost"
 
 # Static file serving
-executeTest "StaticFile-trivial"
-executeTest "StaticFile-16M"
+verifyTest "StaticFile-trivial"
 
-# Browser simulation (static file serving, Session + Compression middleware)
-# Note that JMeter will use 4 additional connections per client to retrieve the embedded page resources.
-executeTest "BrowserSimulation"
-
-# Simple tests, with SSL enabled (with and without keepalive)
-executeTest "HelloSSL"
-executeTest "HelloSSLHandshake"
-
-# Think time tests, simulating blocking or non-blocking IO waits in the route handler
-executeTest "ThinkTimeSync"
-executeTest "ThinkTimeAsync"
+# SSL (with keepalive)
+verifyTest "HelloSSL"
 
 # Exit with resulting return code
 exit $rc

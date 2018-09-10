@@ -38,7 +38,7 @@ before_install:
 # Attempt to build each test suite, run (functional) verification
 script:
   - ./Bench-Kitura-Core/build.sh
-  - ./Bench-Kitura-Core/run.sh verify
+  - ./Bench-Kitura-Core/verify.sh
   - ./Bench-Kitura-TechEmpower/build.sh
   - ./Bench-Kitura-SwiftMetrics/build.sh
   - ./Bench-Kitura-Blog/build.sh
