@@ -138,9 +138,7 @@ function setParams {
     esac
 
     # Override ITERATIONS, DURATION and CLIENTS in verify mode
-echo "Benchmark mode = $BENCHMARK_MODE"
     if [ "$BENCHMARK_MODE" = "verify" ]; then
-echo "Verify mode"
       ITERATIONS=1
       DURATION=10
       CLIENTS=4
