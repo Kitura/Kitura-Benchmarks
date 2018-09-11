@@ -8,7 +8,7 @@
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Import functions from common benchmarking scripts
-ln -sf $dir/../Bench-Swift $dir/bench
+ln -sfn $dir/../Bench-Swift $dir/bench
 . $dir/bench/lib/bench.sh
 . $dir/bench/lib/build.sh
 
@@ -44,9 +44,6 @@ function setParams {
 
 # Keep track of return code from successive benchmark runs
 rc=0
-
-# Allow 'verify' flag to be passed in
-BENCHMARK_MODE="$1"
 
 # Ensure results are created in the project directory
 cd $dir

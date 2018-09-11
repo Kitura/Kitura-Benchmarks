@@ -8,7 +8,7 @@
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Import functions from common benchmarking scripts
-ln -sf $dir/../Bench-Swift $dir/bench
+ln -sfn $dir/../Bench-Swift $dir/bench
 . $dir/bench/lib/bench.sh
 . $dir/bench/lib/build.sh
 
