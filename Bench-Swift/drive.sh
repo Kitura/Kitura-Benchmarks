@@ -74,7 +74,9 @@ OSX_DISABLE_FIREWALL=yes   # Disable OSX firewall during test? (requires sudo)
 
 SUPPORTED_OSES="Linux Darwin"
 
-# Customize this section appropriately for your hardware
+# Customize this section appropriately for your hardware. Alternatively, you can
+# create a file named <hostname>_setup to enable host-based customization. See the
+# included example_setup file for an example.
 DRIVER_AFFINITY=""
 APP_AFFINITY=""
 WORK_THREADS=4
@@ -108,12 +110,6 @@ fi
 
 # Determine location of this script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-# Create a file named <hostname>_setup to enable host-based customization
-if [ -e "$SCRIPT_DIR/`hostname`_setup" ]; then
-  echo "Using customization for host `hostname`"
-  source $SCRIPT_DIR/`hostname`_setup
-fi
 
 # Consume cmdline args (simplest possible implementation for now)
 if [ -z "$1" -o "$1" == "--help" ]; then
@@ -225,6 +221,12 @@ jmeter)
   fi
   ;;
 esac
+
+# Load overrides from a file named <hostname>_setup, if it exists
+if [ -e "$SCRIPT_DIR/`hostname`_setup" ]; then
+  echo "Using customization for host `hostname`"
+  source $SCRIPT_DIR/`hostname`_setup
+fi
 
 #
 # Gets fractional CPU time from the /proc filesystem (Linux only)

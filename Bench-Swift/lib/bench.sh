@@ -30,7 +30,7 @@ function executeTest {
    
     # Override with benchmark-specific values 
     setParams $TESTNAME
-
+    
     # Set up environment for driver scripts
     export URL CLIENTS DURATION ITERATIONS DRIVER INTERVAL VERBOSE_TRACE JSONFILE WRK_SCRIPT JMETER_SCRIPT WORK_RATE RUNNAME PRE_RUN_SCRIPT CLIENT
 
