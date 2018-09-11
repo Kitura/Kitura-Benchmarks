@@ -8,35 +8,13 @@
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Import functions from common benchmarking scripts
-ln -sfn $dir/../Bench-Swift $dir/bench
+ln -sf $dir/../Bench-Swift $dir/bench
 . $dir/bench/lib/bench.sh
 . $dir/bench/lib/build.sh
 
-# Define functions required to execute benchmarks
+# Import functions required to execute benchmarks
 # (see: Bench-Swift/lib/bench.sh)
-
-function setParams {
-    local TESTNAME="$1"
-    case "$TESTNAME" in
-    Rymcol-Blog)
-      IMPLEMENTATION="Blog"
-      URL="http://localhost:8080/blog"
-      CLIENTS=50
-      DURATION=60
-      ITERATIONS=2
-      ;;
-    Rymcol-JSON)
-      IMPLEMENTATION="Blog"
-      URL="http://localhost:8080/json"
-      CLIENTS=50
-      DURATION=30
-      ITERATIONS=3
-      ;;
-    *)
-      echo "Unknown test '$TESTNAME'"
-      ;;
-    esac
-}
+. $dir/benchmarks.sh
 
 ###########################
 ### Benchmark Execution ###
@@ -52,8 +30,18 @@ cd $dir
 # if one exists
 preserveDir results
 
-executeTest "Rymcol-Blog"
-executeTest "Rymcol-JSON"
+# Simple tests
+verifyTest "HelloWorld"
+
+# Codable tests (requires a Swift 4 baseline)
+verifyTest "CodableRoutingGet"
+verifyTest "CodableRoutingPost"
+
+# Static file serving
+verifyTest "StaticFile-trivial"
+
+# SSL (with keepalive)
+verifyTest "HelloSSL"
 
 # Exit with resulting return code
 exit $rc

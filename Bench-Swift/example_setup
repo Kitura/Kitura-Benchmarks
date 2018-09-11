@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# Example host-based customization file. Here you can define host-specific
+# constants such as CPU affinity, network addresses and so on.
+# Variables defined here can refer to other variables set within the drive.sh
+# script, such as the CPULIST for application affinity.
+#
+DRIVER_AFFINITY="numactl --cpunodebind=1 --membind=1"
+APP_AFFINITY="numactl --physcpubind=$CPULIST --membind=0"
+WORK_THREADS=16
+
+export DRIVER_AFFINITY APP_AFFINITY WORK_THREADS

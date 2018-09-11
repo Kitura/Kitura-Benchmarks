@@ -74,20 +74,12 @@ OSX_DISABLE_FIREWALL=yes   # Disable OSX firewall during test? (requires sudo)
 
 SUPPORTED_OSES="Linux Darwin"
 
-# Customize this section appropriately for your hardware
-case `uname` in
-Linux)
-  DRIVER_AFFINITY="numactl --cpunodebind=1 --membind=1"
-  APP_AFFINITY="numactl --physcpubind=$CPULIST --membind=0"
-  WORK_THREADS=16
-  ;;
-Darwin)
-  # Don't know if this is possible on OS X...
-  DRIVER_AFFINITY=""
-  APP_AFFINITY=""
-  WORK_THREADS=4
-  ;;
-esac
+# Customize this section appropriately for your hardware. Alternatively, you can
+# create a file named <hostname>_setup to enable host-based customization. See the
+# included example_setup file for an example.
+DRIVER_AFFINITY=""
+APP_AFFINITY=""
+WORK_THREADS=4
 
 # Check this OS is supported
 if [[ ! $SUPPORTED_OSES =~ `uname` ]]; then
@@ -229,6 +221,12 @@ jmeter)
   fi
   ;;
 esac
+
+# Load overrides from a file named <hostname>_setup, if it exists
+if [ -e "$SCRIPT_DIR/`hostname`_setup" ]; then
+  echo "Using customization for host `hostname`"
+  source $SCRIPT_DIR/`hostname`_setup
+fi
 
 #
 # Gets fractional CPU time from the /proc filesystem (Linux only)
