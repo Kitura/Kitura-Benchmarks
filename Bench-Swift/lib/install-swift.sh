@@ -26,31 +26,39 @@ function installSwift {
     case "$swiftMajor" in
     3)
       echo "Switching to Xcode 8.3.3 for Swift 3.x"
-      sudo xcode-select -s /Applications/Xcode8.3.3.app
-      xcode-select -p
+      switchXcodeIfAvailable /Applications/Xcode8.3.3.app
       ;;
     4)
       case "$swiftMinor" in
       0)
         echo "Switching to Xcode 9.2 for Swift 4.0.x"
-        sudo xcode-select -s /Applications/Xcode9.2.app
+        switchXcodeIfAvailable /Applications/Xcode9.2.app
         ;;
       1)
         echo "Switching to Xcode 9.4 for Swift 4.1.x"
-        sudo xcode-select -s /Applications/Xcode9.4.app
+        switchXcodeIfAvailable /Applications/Xcode9.4.app
         ;;
       2)
         echo "Switching to Xcode 10.0 for Swift 4.2.x"
-        sudo xcode-select -s /Applications/Xcode10.0.app
+        switchXcodeIfAvailable /Applications/Xcode10.0.app
         ;;
       *)
         echo "Unknown Swift 4 minor version: ${swiftMinor}"
       esac
-      xcode-select -p
       ;;
     *)
       echo "Unknown Swift major version: $swiftMajor"
     esac
+    echo "Selected Xcode installation: `xcode-select -p`"
     ;;
   esac
+}
+
+function switchXcodeIfAvailable {
+  local xcodePath="$1"
+  if [ -d "$xcodePath" ]; then
+    sudo xcode-select -s $xcodePath
+  else
+    echo "No Xcode installation found at $xcodePath"
+  fi
 }
