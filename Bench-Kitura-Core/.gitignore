@@ -38,6 +38,7 @@ playground.xcworkspace
 Packages/
 .build/
 .build_gcd/
+Package.resolved
 
 # CocoaPods
 #
@@ -70,8 +71,8 @@ fastlane/test_output
 perf.data
 perf.data.old
 
-# Check out of dependent projects
-bench/
+# Symlink to Bench-Swift
+bench
 
 # Our custom build / benchmark artefacts
 baseline/
