@@ -22,6 +22,7 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(name: "HelloWorld",   dependencies: benchmarkDependencies),
+        .target(name: "QueryParams",   dependencies: benchmarkDependencies),
         .target(name: "HelloLogging", dependencies: benchmarkDependencies),
         .target(name: "HelloSSL",     dependencies: benchmarkDependencies),
         .target(name: "JSON",         dependencies: benchmarkDependencies),
