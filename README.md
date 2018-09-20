@@ -1,7 +1,12 @@
 # Kitura-Benchmarks
-
-![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)
-![Linux](https://img.shields.io/badge/os-linux-green.svg?style=flat)
+<p align="center">
+<a href="https://travis-ci.org/IBM-Swift/Kitura-Benchmarks">
+<img src="https://travis-ci.org/IBM-Swift/Kitura-Benchmarks.svg?branch=master" alt="Build Status - Master">
+</a>
+<img src="https://img.shields.io/badge/os-macOS-green.svg?style=flat" alt="macOS">
+<img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux">
+<img src="https://img.shields.io/badge/license-Apache2-blue.svg?style=flat" alt="Apache 2">
+</p>
 
 ## Summary
 
