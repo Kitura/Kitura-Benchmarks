@@ -15,7 +15,6 @@
  */
 
 import Kitura
-import SwiftyJSON
 import LoggerAPI
 import HeliumLogger
 import Foundation
