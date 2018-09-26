@@ -31,10 +31,13 @@ Darwin)
   ;;
 esac
 
+echo "Swift build flags: $SWIFT_BUILD_FLAGS"
 # Build 'new' version
 # If $REPO and $NEW_COMMIT are set, edit package $REPO to $NEW_COMMIT before building
 pushd $dir/latest/
 build "$dir/newBuild" "$REPO" "$NEW_COMMIT"
+#Build 'nio' version
+build "$dir/nio" "$REPO" "$NEW_COMMIT"
 popd
 
 # Build 'baseline' version
