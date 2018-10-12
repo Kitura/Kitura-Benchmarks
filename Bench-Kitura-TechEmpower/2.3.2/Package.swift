@@ -72,25 +72,32 @@ dependencies.append(contentsOf: [
 #endif
 
 let package = Package(
-    name: "Bench-Kitura-TechEmpower",
+    name: "Kitura-TechEmpower",
     dependencies: dependencies,
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages which this package depends on.
+        .target(
+            name: "TechEmpowerCommon",
+            dependencies: []),
+        .target(
+            name: "KueryPostgres",
+            dependencies: [.target(name: "TechEmpowerCommon"), "Configuration", "SwiftKueryPostgreSQL"]),
+        .target(
+            name: "KueryPostgresRaw",
+            dependencies: [.target(name: "KueryPostgres"), "LoggerAPI"]),
+        .target(
+            name: "TechEmpower",
+            dependencies: ["Kitura"]),
+        .target(
+            name: "TechEmpowerPostgres",
+            dependencies: [.target(name: "KueryPostgresRaw"), "Kitura", "HeliumLogger", "KituraStencil"]),
+        .target(
+            name: "TechEmpowerPostgresMustache",
+            dependencies: [.target(name: "KueryPostgresRaw"), "Kitura", "HeliumLogger", "KituraMustache"]),
+        .target(
+            name: "TechEmpowerMongoKitten",
+            dependencies: [.target(name: "TechEmpowerCommon"), "Kitura", "HeliumLogger", "Configuration", "MongoKitten", "KituraStencil"]),
         .target(
             name: "TechEmpowerCouch",
             dependencies: ["Kitura", "HeliumLogger", "CouchDB"]),
-        .target(
-            name: "TechEmpowerKuery",
-            dependencies: ["Kitura", "HeliumLogger", "Configuration", "SwiftKueryPostgreSQL", "KituraStencil"]),
-        .target(
-            name: "TechEmpowerKueryPostgres",
-            dependencies: ["Kitura", "HeliumLogger", "Configuration", "SwiftKueryPostgreSQL", "KituraStencil"]),
-        .target(
-            name: "TechEmpowerKueryMustache",
-            dependencies: ["Kitura", "HeliumLogger", "Configuration", "SwiftKueryPostgreSQL", "KituraMustache"]),
-        .target(
-            name: "TechEmpowerMongoKitten",
-            dependencies: ["Kitura", "HeliumLogger", "Configuration", "MongoKitten", "KituraStencil"]),
     ]
 )
