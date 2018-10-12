@@ -4,36 +4,52 @@
 import PackageDescription
 
 let package = Package(
-    name: "Kitura-Bench-TechEmpower",
+    name: "Kitura-TechEmpower",
     dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/IBM-Swift/Kitura.git", from: "2.2.0"),
-        .package(url: "https://github.com/IBM-Swift/HeliumLogger.git", from: "1.0.0"),
+        .package(url: "https://github.com/IBM-Swift/Kitura.git", from: "2.3.0"),
+        .package(url: "https://github.com/IBM-Swift/LoggerAPI.git", from: "1.7.0"),
+        .package(url: "https://github.com/IBM-Swift/HeliumLogger.git", from: "1.7.0"),
         .package(url: "https://github.com/IBM-Swift/Configuration.git", from: "3.0.0"),
         .package(url: "https://github.com/IBM-Swift/Kitura-CouchDB.git", from: "2.0.0"),
-        .package(url: "https://github.com/IBM-Swift/Swift-Kuery-PostgreSQL", from: "1.0.0"),
+        .package(url: "https://github.com/IBM-Swift/Swift-Kuery-PostgreSQL.git", from: "1.0.0"),
+        .package(url: "https://github.com/IBM-Swift/Swift-Kuery-ORM.git", from: "0.3.0"),
         .package(url: "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git", from: "1.10.0"),
         .package(url: "https://github.com/IBM-Swift/Kitura-MustacheTemplateEngine.git", from: "1.8.0"),
-        .package(url: "https://github.com/OpenKitten/MongoKitten.git", from: "4.0.0"),
+        .package(url: "https://github.com/OpenKitten/MongoKitten.git", from: "4.1.3"),
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages which this package depends on.
+        .target(
+            name: "TechEmpowerCommon",
+            dependencies: []),
+        .target(
+            name: "KueryPostgres",
+            dependencies: [.target(name: "TechEmpowerCommon"), "Configuration", "SwiftKueryPostgreSQL"]),
+        .target(
+            name: "KueryPostgresRaw",
+            dependencies: [.target(name: "KueryPostgres"), "LoggerAPI"]),
+        .target(
+            name: "KueryPostgresORM",
+            dependencies: [.target(name: "KueryPostgres"), "LoggerAPI", "SwiftKueryORM"]),
+        .target(
+            name: "TechEmpower",
+            dependencies: ["Kitura"]),
+        .target(
+            name: "TechEmpowerPostgres",
+            dependencies: [.target(name: "KueryPostgresRaw"), "Kitura", "HeliumLogger", "KituraStencil"]),
+        .target(
+            name: "TechEmpowerPostgresORM",
+            dependencies: [.target(name: "KueryPostgresORM"), "Kitura", "HeliumLogger", "KituraStencil"]),
+        .target(
+            name: "TechEmpowerPostgresORMCodable",
+            dependencies: [.target(name: "KueryPostgresORM"), "Kitura", "HeliumLogger", "KituraStencil"]),
+        .target(
+            name: "TechEmpowerPostgresMustache",
+            dependencies: [.target(name: "KueryPostgresRaw"), "Kitura", "HeliumLogger", "KituraMustache"]),
+        .target(
+            name: "TechEmpowerMongoKitten",
+            dependencies: [.target(name: "TechEmpowerCommon"), "Kitura", "HeliumLogger", "Configuration", "MongoKitten", "KituraStencil"]),
         .target(
             name: "TechEmpowerCouch",
             dependencies: ["Kitura", "HeliumLogger", "CouchDB"]),
-        .target(
-            name: "TechEmpowerKuery",
-            dependencies: ["Kitura", "HeliumLogger", "Configuration", "SwiftKueryPostgreSQL", "KituraStencil"]),
-        .target(
-            name: "TechEmpowerKueryPostgres",
-            dependencies: ["Kitura", "HeliumLogger", "Configuration", "SwiftKueryPostgreSQL", "KituraStencil"]),
-        .target(
-            name: "TechEmpowerKueryMustache",
-            dependencies: ["Kitura", "HeliumLogger", "Configuration", "SwiftKueryPostgreSQL", "KituraMustache"]),
-        .target(
-            name: "TechEmpowerMongoKitten",
-            dependencies: ["Kitura", "HeliumLogger", "Configuration", "MongoKitten", "KituraStencil"]),
     ]
 )
