@@ -43,8 +43,8 @@ executeTest "JSONParsing"
 #executeTest "JSONDecoderDouble"
 #executeTest "JSONEncoderSmallStruct"
 #executeTest "JSONDecoderSmallStruct"
-#executeTest "CodableRoutingGet"
-#executeTest "CodableRoutingPost"
+executeTest "CodableRoutingGet"
+executeTest "CodableRoutingPost"
 
 # Static file serving
 executeTest "StaticFile-trivial"
@@ -56,7 +56,8 @@ executeTest "BrowserSimulation"
 
 # Simple tests, with SSL enabled (with and without keepalive)
 executeTest "HelloSSL"
-executeTest "HelloSSLHandshake"
+# Disable SSL handshake benchmark while crash investigated
+#executeTest "HelloSSLHandshake"
 
 # Think time tests, simulating blocking or non-blocking IO waits in the route handler
 executeTest "ThinkTimeSync"
