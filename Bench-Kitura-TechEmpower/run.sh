@@ -12,82 +12,9 @@ ln -sfn $dir/../Bench-Swift $dir/bench
 . $dir/bench/lib/bench.sh
 . $dir/bench/lib/build.sh
 
-# Define functions required to execute benchmarks
+# Import functions required to execute benchmarks
 # (see: Bench-Swift/lib/bench.sh)
-
-function setParams {
-    local TESTNAME="$1"
-    case "$TESTNAME" in
-    TFB-DB-Kuery)
-      IMPLEMENTATION="TechEmpowerKuery"
-      URL="http://localhost:8080/db"
-      DURATION=60
-      ITERATIONS=3
-      CLIENTS=128
-      # TODO: pre-run script needed?
-      # At the moment this depends on the database server being left in a clean state between executions.
-      #PRE_RUN_SCRIPT="$dir/scripts/postgres_setup.sh"
-      ;;
-    TFB-DB-Mongo)
-      IMPLEMENTATION="TechEmpowerMongoKitten"
-      URL="http://localhost:8080/db"
-      DURATION=60
-      ITERATIONS=3
-      CLIENTS=128
-      ;;
-    TFB-Updates-Kuery)
-      IMPLEMENTATION="TechEmpowerKuery"
-      URL="http://localhost:8080/updates?queries=1"
-      DURATION=60
-      ITERATIONS=3
-      CLIENTS=128
-      ;;
-    TFB-Updates-Mongo)
-      IMPLEMENTATION="TechEmpowerMongoKitten"
-      URL="http://localhost:8080/updates?queries=1"
-      DURATION=60
-      ITERATIONS=3
-      CLIENTS=128
-      ;;
-    TFB-Fortunes-Kuery)
-      IMPLEMENTATION="TechEmpowerKuery"
-      URL="http://localhost:8080/fortunes"
-      DURATION=60
-      ITERATIONS=3
-      CLIENTS=128
-      ;;
-    TFB-Fortunes-Mongo)
-      IMPLEMENTATION="TechEmpowerMongoKitten"
-      URL="http://localhost:8080/fortunes"
-      DURATION=60
-      ITERATIONS=3
-      CLIENTS=128
-      ;;
-    *)
-      echo "Unknown test '$TESTNAME'"
-      ;;
-    esac
-}
-
-function setupBenchmark {
-    local TESTNAME="$1"
-    case "$TESTNAME" in
-    *)
-      # TODO: set up database?
-      # At the moment this relies on the database being started in advance.
-      ;;
-    esac
-}
-
-function postBenchmark {
-    local TESTNAME="$1"
-    case "$TESTNAME" in
-    *)
-      # TODO: stop database?
-      # At the moment the database will be left running after the run completes.
-      ;;
-    esac
-}
+. $dir/benchmarks.sh
 
 ###########################
 ### Benchmark Execution ###
@@ -107,6 +34,13 @@ preserveDir results
 executeTest "TFB-DB-Kuery"
 executeTest "TFB-Updates-Kuery"
 executeTest "TFB-Fortunes-Kuery"
+
+# Kuery ORM tests (requires Kitura 2.5 baseline)
+#executeTest "TFB-DB-Kuery-ORM"
+#executeTest "TFB-DB-Kuery-ORM-Codable"
+#executeTest "TFB-Updates-Kuery-ORM"
+#executeTest "TFB-Updates-Kuery-ORM-Codable"
+#executeTest "TFB-Fortunes-Kuery-ORM"
 
 # Exit with resulting return code
 exit $rc
