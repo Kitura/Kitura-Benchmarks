@@ -41,14 +41,14 @@ let dbRows = 10000
 let maxValue = 10000
 
 class World: Table {
-    let tableName = "World"
+    let tableName = "world"
     
     let id = Column("id")
-    let randomNumber = Column("randomNumber")
+    let randomNumber = Column("randomnumber")
 }
 
 class Fortunes: Table {
-    let tableName = "Fortune"
+    let tableName = "fortune"
 
     let id = Column("id")
     let message = Column("message")
