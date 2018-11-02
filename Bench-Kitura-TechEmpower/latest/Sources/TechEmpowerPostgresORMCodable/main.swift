@@ -93,6 +93,10 @@ router.get("/queries") { (params: TFBParams, respondWith: @escaping ([RandomRow]
     let numQueries = max(1, min(params.queries, 500))  // Snap to range of 1-500 as per test spec
     getRandomRows(count: numQueries, completion: respondWith)
 }
+router.get("/queriesParallel") { (params: TFBParams, respondWith: @escaping ([RandomRow]?, RequestError?) -> Void) in
+    let numQueries = max(1, min(params.queries, 500))  // Snap to range of 1-500 as per test spec
+    getRandomRowsParallel(count: numQueries, completion: respondWith)
+}
 
 //
 // TechEmpower test 4: fortunes (full ORM)
@@ -121,6 +125,10 @@ router.get("/fortunes") {
 router.get("/updates") { (params: TFBParams, respondWith: @escaping ([RandomRow]?, RequestError?) -> Void) in
     let numQueries = max(1, min(params.queries, 500))  // Snap to range of 1-500 as per test spec
     updateRandomRows(count: numQueries, completion: respondWith)
+}
+router.get("/updatesParallel") { (params: TFBParams, respondWith: @escaping ([RandomRow]?, RequestError?) -> Void) in
+    let numQueries = max(1, min(params.queries, 500))  // Snap to range of 1-500 as per test spec
+    updateRandomRowsParallel(count: numQueries, completion: respondWith)
 }
 
 
