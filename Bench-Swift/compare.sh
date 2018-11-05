@@ -296,6 +296,7 @@ for i in `seq 1 $ITERATIONS`; do
       GOOD_REQUESTS[$runNo]=$(bc <<< "${RAW_REQUESTS[$runNo]} - ${BAD_REQUESTS[$runNo]}")
       THROUGHPUT[$runNo]=$(bc <<< "${RAW_THROUGHPUT[$runNo]} * ${GOOD_REQUESTS[$runNo]} / ${RAW_REQUESTS[$runNo]}")
       echo "WARNING: Not all requests were successful: bad=${BAD_REQUESTS[$runNo]}, good=${GOOD_REQUESTS[$runNo]}, raw throughput=${RAW_THROUGHPUT[$runNo]}, adjusted=${THROUGHPUT[$runNo]}"
+      json_number "Raw Throughput" ${RAW_THROUGHPUT[$runNo]}
     else
       THROUGHPUT[$runNo]=${RAW_THROUGHPUT[$runNo]}
     fi
@@ -317,6 +318,7 @@ for i in `seq 1 $ITERATIONS`; do
     json_number "Avg Latency" ${LATAVG[$runNo]}
     json_number "99% Latency" ${LAT99PCT[$runNo]}
     json_number "Max Latency" ${LATMAX[$runNo]}
+    json_number "Bad Requests" ${BAD_REQUESTS[$runNo]}
     # Surface CPU time stats (sum of instances) in json file, only print if requested
     # Record number of server processes that were summarized
     NUM_PROCESSES=`grep 'Total server processes' $out | sed -e's#Total server processes: ##'`
