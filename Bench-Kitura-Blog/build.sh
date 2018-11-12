@@ -34,18 +34,6 @@ esac
 # Build 'new' and "nio" version
 # If $REPO and $NEW_COMMIT are set, edit package $REPO to $NEW_COMMIT before building
 
-function cloneProject {
-  local projectPath=$1
-  local newPath=$2
-  pushd $projectPath
-  swift package reset
-  popd
-  if [ -d $newPath ]; then
-    preserveDir $newPath
-  fi
-  cp -R -p $projectPath $newPath
-}
-
 cloneProject $dir/latest $dir/latest-nio
 
 pushd $dir/latest/
