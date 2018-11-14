@@ -10,8 +10,8 @@ BUILD_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 function cloneProject {
   local projectPath=$1
   local newPath=$2
-  installSwift
   cd $projectPath
+  installSwift
   swift package reset
   if [ -d $newPath ]; then
     preserveDir $newPath
