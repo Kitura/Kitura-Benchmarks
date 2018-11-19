@@ -104,3 +104,4 @@ before_install:
   - git clone https://github.com/djones6/wrk -b interval && cd wrk && make > build.out && export PATH="$PWD:$PATH" && cd ..
   - git clone https://github.com/apache/jmeter.git -b v2_13 && export PATH="$PWD/jmeter/bin:$PATH" 
   - if [[ -n "$SWIFT_VERSION" ]]; then swiftenv install $SWIFT_VERSION -s; fi
+
