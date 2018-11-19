@@ -9,20 +9,89 @@ branches:
 # by .swift-version, unless SWIFT_VERSION is specified.
 matrix:
   include:
+    #
+    # Build and functional verification using Core test suite
+    #
     - os: linux
       dist: trusty
       sudo: required
       env: SWIFT_VERSION=4.0.3
+      script:
+        - ./Bench-Kitura-Core/build.sh
+        - ./Bench-Kitura-Core/verify.sh
     - os: linux
       dist: trusty
       sudo: required
+      script:
+        - ./Bench-Kitura-Core/build.sh
+        - ./Bench-Kitura-Core/verify.sh
     - os: osx
       osx_image: xcode9.2
       sudo: required
       env: SWIFT_VERSION=4.0.3
+      script:
+        - ./Bench-Kitura-Core/build.sh
+        - ./Bench-Kitura-Core/verify.sh
     - os: osx
-      osx_image: xcode9.4
+      osx_image: xcode10
       sudo: required
+      script:
+        - ./Bench-Kitura-Core/build.sh
+        - ./Bench-Kitura-Core/verify.sh
+    #
+    # Build TechEmpower test suite
+    #
+    - os: linux
+      dist: trusty
+      sudo: required
+      env: SWIFT_VERSION=4.0.3
+      script:
+        - ./Bench-Kitura-TechEmpower/build.sh
+    - os: linux
+      dist: trusty
+      sudo: required
+      script:
+        - ./Bench-Kitura-TechEmpower/build.sh
+    - os: osx
+      osx_image: xcode9.2
+      sudo: required
+      env: SWIFT_VERSION=4.0.3
+      script:
+        - ./Bench-Kitura-TechEmpower/build.sh
+    - os: osx
+      osx_image: xcode10
+      sudo: required
+      script:
+        - ./Bench-Kitura-TechEmpower/build.sh
+    #
+    # Build SwiftMetrics and Blog test suites
+    #
+    - os: linux
+      dist: trusty
+      sudo: required
+      env: SWIFT_VERSION=4.0.3
+      script:
+        - ./Bench-Kitura-SwiftMetrics/build.sh
+        - ./Bench-Kitura-Blog/build.sh
+    - os: linux
+      dist: trusty
+      sudo: required
+      script:
+        - ./Bench-Kitura-SwiftMetrics/build.sh
+        - ./Bench-Kitura-Blog/build.sh
+    - os: osx
+      osx_image: xcode9.2
+      sudo: required
+      env: SWIFT_VERSION=4.0.3
+      script:
+        - ./Bench-Kitura-SwiftMetrics/build.sh
+        - ./Bench-Kitura-Blog/build.sh
+    - os: osx
+      osx_image: xcode10
+      sudo: required
+      script:
+        - ./Bench-Kitura-SwiftMetrics/build.sh
+        - ./Bench-Kitura-Blog/build.sh
 
 # Java required for jmeter
 language: java
@@ -34,12 +103,4 @@ before_install:
   - git clone https://github.com/djones6/wrk -b interval && cd wrk && make > build.out && export PATH="$PWD:$PATH" && cd ..
   - git clone https://github.com/apache/jmeter.git -b v2_13 && export PATH="$PWD/jmeter/bin:$PATH" 
   - if [[ -n "$SWIFT_VERSION" ]]; then swiftenv install $SWIFT_VERSION -s; fi
-
-# Attempt to build each test suite, run (functional) verification
-script:
-  - ./Bench-Kitura-Core/build.sh
-  - ./Bench-Kitura-Core/verify.sh
-  - ./Bench-Kitura-TechEmpower/build.sh
-  - ./Bench-Kitura-SwiftMetrics/build.sh
-  - ./Bench-Kitura-Blog/build.sh
 
