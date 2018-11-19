@@ -8,7 +8,9 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/RuntimeTools/SwiftMetrics.git", from: "2.0.0"),
+        //Switch back to the latest release of SwiftMetrics once the tagging is done
+        //.package(url: "https://github.com/RuntimeTools/SwiftMetrics.git", from: "2.0.0"),
+        .package(url: "https://github.com/RuntimeTools/SwiftMetrics.git", .branch("bd5832af20c284093180ba40e4ca5e160d88820c")),
         .package(url: "https://github.com/IBM-Swift/Kitura.git", from: "2.0.0"),
         .package(url: "https://github.com/IBM-Swift/HeliumLogger.git", from: "1.0.0"),
     ],
