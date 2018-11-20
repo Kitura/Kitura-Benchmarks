@@ -288,7 +288,18 @@ for i in `seq 1 $ITERATIONS`; do
         continue
     fi
     # Note, removal of carriage return chars (^M) required when client output comes from 'ssh -t'
-    THROUGHPUT[$runNo]=`grep 'Requests/sec' $out | awk '{gsub("\\r", ""); print $2}'`
+    RAW_THROUGHPUT[$runNo]=`grep 'Requests/sec' $out | awk '{gsub("\\r", ""); print $2}'`
+    BAD_REQUESTS[$runNo]=`(grep 'Non-2xx or 3xx responses' $out || echo "0") | awk '{gsub("\\r", ""); x=0+$5; print x}'`
+    # Detect bad request statistics output by wrk
+    if [ ${BAD_REQUESTS[$runNo]} -gt 0 ]; then
+      RAW_REQUESTS[$runNo]=`grep '[0-9][0-9]* requests in .*, .* read$' $out | awk '{gsub("\\r", ""); print $1}'`
+      GOOD_REQUESTS[$runNo]=$(bc <<< "${RAW_REQUESTS[$runNo]} - ${BAD_REQUESTS[$runNo]}")
+      THROUGHPUT[$runNo]=$(bc <<< "${RAW_THROUGHPUT[$runNo]} * ${GOOD_REQUESTS[$runNo]} / ${RAW_REQUESTS[$runNo]}")
+      echo "WARNING: Not all requests were successful: bad=${BAD_REQUESTS[$runNo]}, good=${GOOD_REQUESTS[$runNo]}, raw throughput=${RAW_THROUGHPUT[$runNo]}, adjusted=${THROUGHPUT[$runNo]}"
+      json_number "Raw Throughput" ${RAW_THROUGHPUT[$runNo]}
+    else
+      THROUGHPUT[$runNo]=${RAW_THROUGHPUT[$runNo]}
+    fi
     CPU[$runNo]=`grep 'Average CPU util' $out | awk '{print $4}'`
     MEM[$runNo]=`grep 'RSS (kb)' $out | sed -e's#.*max=\([0-9][0-9]*\).*#\1#' | awk '{total += $1} END {print total}'`
     LATAVG[$runNo]=`grep 'Latency  ' $out | awk '{print $2}' | awk '/[0-9\.]+s/ { print $1 * 1000 } /[0-9\.]+ms/ { print $1 / 1 } /[0-9\.]+us/ { print $1/1000 }'`
@@ -307,6 +318,7 @@ for i in `seq 1 $ITERATIONS`; do
     json_number "Avg Latency" ${LATAVG[$runNo]}
     json_number "99% Latency" ${LAT99PCT[$runNo]}
     json_number "Max Latency" ${LATMAX[$runNo]}
+    json_number "Bad Requests" ${BAD_REQUESTS[$runNo]}
     # Surface CPU time stats (sum of instances) in json file, only print if requested
     # Record number of server processes that were summarized
     NUM_PROCESSES=`grep 'Total server processes' $out | sed -e's#Total server processes: ##'`
