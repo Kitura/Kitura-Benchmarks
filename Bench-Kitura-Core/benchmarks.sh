@@ -132,6 +132,9 @@ function setParams {
       # Add an Accept header to trigger Media Type processing
       WRK_SCRIPT="$dir/payloads/simpleStructPayload_accept.lua"
       ;;
+    QueryParams)
+      URL="http://localhost:8080/echo?message=foo"
+      ;;
     *)
       echo "Unknown test '$TESTNAME'"
       ;;
