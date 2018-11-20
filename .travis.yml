@@ -99,6 +99,7 @@ language: java
 # Install prereqs (linux deps, swiftenv, wrk, jmeter)
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install bc libhttp-date-perl clang libicu-dev libcurl4-openssl-dev libssl-dev libpython2.7; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install libressl; fi
   - git clone https://github.com/kylef/swiftenv.git ~/.swiftenv && export SWIFTENV_ROOT="$HOME/.swiftenv" && export PATH="$SWIFTENV_ROOT/bin:$PATH" && eval "$(swiftenv init -)"
   - git clone https://github.com/djones6/wrk -b interval && cd wrk && make > build.out && export PATH="$PWD:$PATH" && cd ..
   - git clone https://github.com/apache/jmeter.git -b v2_13 && export PATH="$PWD/jmeter/bin:$PATH" 

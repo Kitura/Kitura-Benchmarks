@@ -6,6 +6,21 @@ BUILD_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # import install Swift function
 . $BUILD_SCRIPT_DIR/install-swift.sh
 
+#Copies a project to another project
+function cloneProject {
+  local projectPath=$1
+  local newPath=$2
+  cd $projectPath
+  installSwift
+  swift package reset
+  if [ -d $newPath ]; then
+    preserveDir $newPath
+  fi
+  cd -
+  cp -R -p $projectPath $newPath
+}
+
+
 #
 # Builds a Swift project.
 #
