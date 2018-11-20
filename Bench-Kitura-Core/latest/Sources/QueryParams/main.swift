@@ -28,7 +28,7 @@ let router = Router()
 //
 // Plaintext echo of 'message' query parameter
 //
-router.get("/plaintext") {
+router.get("/echo") {
 request, response, next in
     let echo = request.queryParameters["message"] ?? "Supply a message using ?message=foo"
     response.headers["Content-Type"] = "text/plain"
