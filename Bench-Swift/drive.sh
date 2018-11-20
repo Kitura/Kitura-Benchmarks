@@ -677,6 +677,17 @@ function setup() {
 }
 
 #
+# Check that no server is already running. This is to avoid erroneously
+# driving load against the wrong server instance (such as if multiple people
+# were trying to run benchmarks on the same system at once).
+#
+function checkForExistingServer() {
+    curl -k -m 1 --head $URL >/dev/null 2>&1 || return
+    echo "ERROR: curl was able to connect to $URL - is another server running?"
+    exit 1
+}
+
+#
 # Start server instance(s) and associated monitoring
 # Expects $INSTANCES, $APP_AFFINITY, $APP_CMD and PROFILER_CMD to be set.
 # If $APP_PWD is set, changes to that directory before executing $APP_CMD.
@@ -708,7 +719,7 @@ function startup() {
   while [ ! $WAIT_SO_FAR -gt $MAX_WAIT_TIME ]; do
     sleep $CHECK_INTERVAL
     let WAIT_SO_FAR=WAIT_SO_FAR+CHECK_INTERVAL
-    ${DRIVER_PREAMBLE} curl -k -m 1 --head $URL >/dev/null 2>&1 && break || echo "Waiting for server - $WAIT_SO_FAR seconds"
+    curl -k -m 1 --head $URL >/dev/null 2>&1 && break || echo "Waiting for server - $WAIT_SO_FAR seconds"
   done
   if [ $WAIT_SO_FAR -gt $MAX_WAIT_TIME ]; then
     echo "App failed to start after $MAX_WAIT_TIME seconds"
@@ -874,6 +885,9 @@ function terminate() {
 }
 
 trap terminate SIGINT SIGQUIT SIGTERM
+
+# Pre-flight checks: make sure no-one else has a running server
+checkForExistingServer
 
 # Begin run
 mkdir -p runs/$RUN_NAME
