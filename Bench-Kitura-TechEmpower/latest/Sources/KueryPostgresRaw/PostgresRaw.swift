@@ -55,25 +55,29 @@ var update = Update(world, set: [(world.randomNumber, RandomRow.randomValue)])
 ///
 public func getFortunes(callback: @escaping ([Fortune]?, AppError?) -> Void) -> Void {
     // Get a dedicated connection object for this transaction from the pool
-    guard let dbConn = dbConnPool.getConnection() else {
-        return callback(nil, AppError.OtherError("Timed out waiting for a DB connection from the pool"))
-    }
-    // Initiate database query
-    let query = Select(from: fortunes)
-    dbConn.execute(query: query) { result in
-        var resultFortunes: [Fortune]? = nil
-        guard let rows = result.asRows, result.success else {
-            return callback(nil, AppError.DBKueryError("Query failed: \(String(describing: result.asError))"))
+    dbConnPool.getConnection { (dbConn, err) in
+        guard let dbConn = dbConn else {
+            guard let err = err else {
+                return callback(nil, AppError.OtherError("Unknown error getting connection from pool"))
+            }
+            return callback(nil, AppError.OtherError("Error getting connection from pool: \(err)"))
         }
-        do {
-            resultFortunes = try rows.map { try Fortune.init(row: $0) }
-        } catch {
-            return callback(nil, AppError.DataFormatError("\(error)"))
+        // Initiate database query
+        let query = Select(from: fortunes)
+        dbConn.execute(query: query) { result in
+            var resultFortunes: [Fortune]? = nil
+            guard let rows = result.asRows, result.success else {
+                return callback(nil, AppError.DBKueryError("Query failed: \(String(describing: result.asError))"))
+            }
+            do {
+                resultFortunes = try rows.map { try Fortune.init(row: $0) }
+            } catch {
+                return callback(nil, AppError.DataFormatError("\(error)"))
+            }
+            // Invoke callback with results
+            callback(resultFortunes, nil)
         }
-        // Invoke callback with results
-        callback(resultFortunes, nil)
     }
-
 }
 
 /// Get a random row (range 1 to 10,000) from the database.
@@ -85,33 +89,38 @@ public func getFortunes(callback: @escaping ([Fortune]?, AppError?) -> Void) -> 
 ///
 public func getRandomRow_Raw(callback: @escaping (RandomRow?, AppError?) -> Void) -> Void {
     // Get a dedicated connection object for this transaction from the pool
-    guard let dbConn = dbConnPool.getConnection() else {
-        return callback(nil, AppError.OtherError("Timed out waiting for a DB connection from the pool"))
-    }
-    // Select random row from database range
-    let rnd = RandomRow.randomId
-    let query = Select(world.randomNumber, from: world)
-        .where(world.id == rnd)
-    // Initiate database query
-    dbConn.execute(query: query) { result in
-        var resultRow: RandomRow? = nil
-        guard let resultSet = result.asResultSet, result.success else {
-            return callback(nil, AppError.DBKueryError("Query failed: \(String(describing: result.asError))"))
-        }
-            
-        for row in resultSet.rows {
-            for value in row {
-                guard let value = value else {
-                    return callback(nil, AppError.DBKueryError("Error: randomNumber value is nil"))
-                }
-                guard let randomNumber = value as? Int32 else {
-                    return callback(nil, AppError.DBKueryError("Error: could not convert \(value) to Int32"))
-                }
-                resultRow = RandomRow(id: rnd, randomNumber: Int(randomNumber))
+    dbConnPool.getConnection { (dbConn, err) in
+        guard let dbConn = dbConn else {
+            guard let err = err else {
+                return callback(nil, AppError.OtherError("Unknown error getting connection from pool"))
             }
+            return callback(nil, AppError.OtherError("Error getting connection from pool: \(err)"))
         }
-        // Invoke callback with results
-        callback(resultRow, nil)
+        // Select random row from database range
+        let rnd = RandomRow.randomId
+        let query = Select(world.randomNumber, from: world)
+            .where(world.id == rnd)
+        // Initiate database query
+        dbConn.execute(query: query) { result in
+            var resultRow: RandomRow? = nil
+            guard let resultSet = result.asResultSet, result.success else {
+                return callback(nil, AppError.DBKueryError("Query failed: \(String(describing: result.asError))"))
+            }
+
+            for row in resultSet.rows {
+                for value in row {
+                    guard let value = value else {
+                        return callback(nil, AppError.DBKueryError("Error: randomNumber value is nil"))
+                    }
+                    guard let randomNumber = value as? Int32 else {
+                        return callback(nil, AppError.DBKueryError("Error: could not convert \(value) to Int32"))
+                    }
+                    resultRow = RandomRow(id: rnd, randomNumber: Int(randomNumber))
+                }
+            }
+            // Invoke callback with results
+            callback(resultRow, nil)
+        }
     }
 }
 
@@ -122,21 +131,26 @@ public func getRandomRow_Raw(callback: @escaping (RandomRow?, AppError?) -> Void
 ///                       update failed.
 ///
 public func updateRow_Raw(id: Int, callback: @escaping (AppError?) -> Void) -> Void {
-    // Get a dedicated connection object for this transaction from the pool
-    guard let dbConn = dbConnPool.getConnection() else {
-        return callback(AppError.OtherError("Timed out waiting for a DB connection from the pool"))
-    }
-    // Generate a random number for this row
-    let rndValue = RandomRow.randomValue
-    let query = Update(world, set: [(world.randomNumber, rndValue)])
-        .where(world.id == id)
-    // Initiate database query
-    dbConn.execute(query: query) { result in
-        guard result.success else {
-            return callback(AppError.DBKueryError("Update failed: \(String(describing: result.asError))"))
+    // Get a dedicated connection object for this transaction from the pool    // Get a dedicated connection object for this transaction from the pool
+    dbConnPool.getConnection { (dbConn, err) in
+        guard let dbConn = dbConn else {
+            guard let err = err else {
+                return callback(AppError.OtherError("Unknown error getting connection from pool"))
+            }
+            return callback(AppError.OtherError("Error getting connection from pool: \(err)"))
         }
-        // Invoke callback once done
-        callback(nil)
+        // Generate a random number for this row
+        let rndValue = RandomRow.randomValue
+        let query = Update(world, set: [(world.randomNumber, rndValue)])
+            .where(world.id == id)
+        // Initiate database query
+        dbConn.execute(query: query) { result in
+            guard result.success else {
+                return callback(AppError.DBKueryError("Update failed: \(String(describing: result.asError))"))
+            }
+            // Invoke callback once done
+            callback(nil)
+        }
     }
 }
 
