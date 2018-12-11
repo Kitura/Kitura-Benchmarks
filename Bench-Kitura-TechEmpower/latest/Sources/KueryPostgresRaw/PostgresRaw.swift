@@ -55,9 +55,9 @@ var update = Update(world, set: [(world.randomNumber, RandomRow.randomValue)])
 ///
 public func getFortunes(callback: @escaping ([Fortune]?, AppError?) -> Void) -> Void {
     // Get a dedicated connection object for this transaction from the pool
-    dbConnPool.getConnection { (dbConn, err) in
+    dbConnPool.getConnection { (dbConn, dbConnErr) in
         guard let dbConn = dbConn else {
-            guard let err = err else {
+            guard let err = dbConnErr else {
                 return callback(nil, AppError.OtherError("Unknown error getting connection from pool"))
             }
             return callback(nil, AppError.OtherError("Error getting connection from pool: \(err)"))
@@ -65,17 +65,73 @@ public func getFortunes(callback: @escaping ([Fortune]?, AppError?) -> Void) -> 
         // Initiate database query
         let query = Select(from: fortunes)
         dbConn.execute(query: query) { result in
-            var resultFortunes: [Fortune]? = nil
-            guard let rows = result.asRows, result.success else {
-                return callback(nil, AppError.DBKueryError("Query failed: \(String(describing: result.asError))"))
+            var resultFortunes: [Fortune] = []
+            // Retrieve all rows from the query result
+            result.asRows {
+                results, err in
+                guard let results = results else {
+                    guard let err = err else {
+                        return callback(nil, AppError.DBKueryError("Query failed, and no error was returned"))
+                    }
+                    return callback(nil, AppError.DBKueryError("Query failed: \(err)"))
+                }
+                do {
+                    // Transform the result rows into an array of Fortune objects
+                    resultFortunes = try results.map { try Fortune.init(row: $0) }
+                } catch {
+                    return callback(nil, AppError.DataFormatError("\(error)"))
+                }
+                // Invoke callback with results
+                callback(resultFortunes, nil)
             }
-            do {
-                resultFortunes = try rows.map { try Fortune.init(row: $0) }
-            } catch {
-                return callback(nil, AppError.DataFormatError("\(error)"))
+        }
+    }
+}
+
+/// Alternate implementation of getFortunes that uses ResultSet.forEach to fetch each
+/// database row sequentially, rather than QueryResult.asRows (which produces an array
+/// of rows). The benefit of forEach is that we do not need to hold two copies of the
+/// entire result set in memory.
+///
+/// - Parameter callback: The callback that will be invoked once the DB query
+///                       has completed and results are available, passing an
+///                       optional [Fortune] (on success) or AppError on
+///                       failure.
+///
+public func getFortunes_forEach(callback: @escaping ([Fortune]?, AppError?) -> Void) -> Void {
+    // Get a dedicated connection object for this transaction from the pool
+    dbConnPool.getConnection { (dbConn, dbConnErr) in
+        guard let dbConn = dbConn else {
+            guard let err = dbConnErr else {
+                return callback(nil, AppError.OtherError("Unknown error getting connection from pool"))
             }
-            // Invoke callback with results
-            callback(resultFortunes, nil)
+            return callback(nil, AppError.OtherError("Error getting connection from pool: \(err)"))
+        }
+        // Initiate database query
+        let query = Select(from: fortunes)
+        dbConn.execute(query: query) { result in
+            var resultFortunes: [Fortune] = []
+            guard let results = result.asResultSet else {
+                guard let queryErr = result.asError else {
+                    return callback(nil, AppError.DBKueryError("Expected a result set, but result was \(result)"))
+                }
+                return callback(nil, AppError.DBKueryError("Query failed: \(queryErr)"))
+            }
+            // Build an array of Fortune objects
+            results.forEach { (values, rowErr, next) in
+                guard let values = values else {
+                    // Reached the final row - call back with the results
+                    return callback(resultFortunes, nil)
+                }
+                // Append this Fortune to the list
+                do {
+                    resultFortunes.append(try Fortune(values: values))
+                    // Process the next column
+                    next()
+                } catch {
+                    return callback(nil, AppError.DataFormatError("\(error)"))
+                }
+            }
         }
     }
 }
@@ -89,12 +145,12 @@ public func getFortunes(callback: @escaping ([Fortune]?, AppError?) -> Void) -> 
 ///
 public func getRandomRow_Raw(callback: @escaping (RandomRow?, AppError?) -> Void) -> Void {
     // Get a dedicated connection object for this transaction from the pool
-    dbConnPool.getConnection { (dbConn, err) in
+    dbConnPool.getConnection { (dbConn, dbConnErr) in
         guard let dbConn = dbConn else {
-            guard let err = err else {
+            guard let dbConnErr = dbConnErr else {
                 return callback(nil, AppError.OtherError("Unknown error getting connection from pool"))
             }
-            return callback(nil, AppError.OtherError("Error getting connection from pool: \(err)"))
+            return callback(nil, AppError.OtherError("Error getting connection from pool: \(dbConnErr)"))
         }
         // Select random row from database range
         let rnd = RandomRow.randomId
@@ -102,24 +158,32 @@ public func getRandomRow_Raw(callback: @escaping (RandomRow?, AppError?) -> Void
             .where(world.id == rnd)
         // Initiate database query
         dbConn.execute(query: query) { result in
-            var resultRow: RandomRow? = nil
-            guard let resultSet = result.asResultSet, result.success else {
-                return callback(nil, AppError.DBKueryError("Query failed: \(String(describing: result.asError))"))
-            }
-
-            for row in resultSet.rows {
-                for value in row {
-                    guard let value = value else {
-                        return callback(nil, AppError.DBKueryError("Error: randomNumber value is nil"))
-                    }
-                    guard let randomNumber = value as? Int32 else {
-                        return callback(nil, AppError.DBKueryError("Error: could not convert \(value) to Int32"))
-                    }
-                    resultRow = RandomRow(id: rnd, randomNumber: Int(randomNumber))
+            guard let resultSet = result.asResultSet else {
+                guard let queryErr = result.asError else {
+                    return callback(nil, AppError.DBKueryError("Expected a result set, but result was \(result)"))
                 }
+                return callback(nil, AppError.DBKueryError("Query failed: \(queryErr)"))
             }
-            // Invoke callback with results
-            callback(resultRow, nil)
+            resultSet.nextRow {
+                values, nextErr in
+                guard let values = values else {
+                    guard let nextErr = nextErr else {
+                        return callback(nil, AppError.DBKueryError("Query failed, and no error was returned"))
+                    }
+                    return callback(nil, AppError.DBKueryError("Query failed: \(nextErr)"))
+                }
+                // There should be exactly one value
+                guard values.count == 1 else {
+                    return callback(nil, AppError.DBKueryError("\(values.count) values returned, expected 1, for query '\(query)'"))
+                }
+                // The value should be an Int32
+                guard let randomNumber = values[0] as? Int32 else {
+                    return callback(nil, AppError.DBKueryError("Could not convert \(String(describing: values[0])) to Int32"))
+                }
+                let resultRow = RandomRow(id: rnd, randomNumber: Int(randomNumber))
+                // Invoke callback with results
+                callback(resultRow, nil)
+            }
         }
     }
 }
