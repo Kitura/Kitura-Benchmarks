@@ -195,7 +195,7 @@ public func getRandomRow_Raw(callback: @escaping (RandomRow?, AppError?) -> Void
 ///                       update failed.
 ///
 public func updateRow_Raw(id: Int, callback: @escaping (AppError?) -> Void) -> Void {
-    // Get a dedicated connection object for this transaction from the pool    // Get a dedicated connection object for this transaction from the pool
+    // Get a dedicated connection object for this transaction from the pool
     dbConnPool.getConnection { (dbConn, err) in
         guard let dbConn = dbConn else {
             guard let err = err else {
