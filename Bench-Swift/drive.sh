@@ -65,7 +65,7 @@ DRIVER_CHOICES="wrk wrk-pipeline wrk-nokeepalive wrk2 jmeter sleep"
 
 # Select profiler with PROFILER env variable
 # (default: none)
-PROFILER_CHOICES="valgrind oprofile oprofile-sys perf perf-cg perf-idle"
+PROFILER_CHOICES="valgrind oprofile oprofile-sys perf perf-cg perf-idle flame flame-all"
 #PROFILER=""
 
 # Flags to enable certain behaviours from this script
@@ -643,10 +643,15 @@ function setup() {
     echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
     PROFILER_CMD="perf record"
     ;;
-  perf-cg)
+  perf-cg|flame)
     # Enable perf to access kernel address maps
     echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
-    PROFILER_CMD="perf record -g"
+    PROFILER_CMD="perf record -F 99 --call-graph dwarf"
+    ;;
+  flame-all)
+    # Enable perf to access kernel address maps
+    echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
+    PROFILER_CMD="perf record -F 99 --call-graph dwarf --all-cpus"
     ;;
   perf-idle)
     # Need root permissions to get scheduler stats
@@ -838,6 +843,13 @@ function teardown() {
     perf report --max-stack=1 --no-children -k /usr/lib/debug/boot/vmlinux-`uname -r` > perf-report.${FIRST_APP_PID}.txt
     cat perf-report.${FIRST_APP_PID}.txt | swift-demangle | sed -e's#  *$##' > perf-report.${FIRST_APP_PID}.demangled.txt
     summarize_perf "perf-report.${FIRST_APP_PID}.demangled.txt"
+    ;;
+  flame|flame-all)
+    # Generate a flame graph
+    if [ ! -d "${SCRIPT_DIR}/FlameGraph" ]; then
+        git clone https://github.com/brendangregg/FlameGraph.git ${SCRIPT_DIR}/FlameGraph
+    fi
+    perf script | ${SCRIPT_DIR}/FlameGraph/stackcollapse-perf.pl | swift-demangle | ${SCRIPT_DIR}/FlameGraph/flamegraph.pl > flamegraph.${FIRST_APP_PID}.svg
     ;;
   perf-idle)
     sudo perf inject -v -s -i perf.data.raw -o perf.data
