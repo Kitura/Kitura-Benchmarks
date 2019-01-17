@@ -649,9 +649,8 @@ function setup() {
     PROFILER_CMD="perf record -F 99 --call-graph dwarf"
     ;;
   flame-all)
-    # Enable perf to access kernel address maps
-    echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
-    PROFILER_CMD="perf record -F 99 --call-graph dwarf --all-cpus"
+    # Need root permissions to profile all processes
+    PROFILER_CMD="sudo perf record -F 99 --call-graph dwarf --all-cpus"
     ;;
   perf-idle)
     # Need root permissions to get scheduler stats
@@ -764,7 +763,7 @@ function shutdown() {
   wait $RSSMON_PIDS
   # Shut down application
   case $PROFILER in
-  perf-idle)
+  perf-idle|flame-all)
     # Perf was run with sudo, must kill with sudo
     sudo kill $APP_PIDS
     ;;
@@ -849,7 +848,11 @@ function teardown() {
     if [ ! -d "${SCRIPT_DIR}/FlameGraph" ]; then
         git clone https://github.com/brendangregg/FlameGraph.git ${SCRIPT_DIR}/FlameGraph
     fi
-    perf script | ${SCRIPT_DIR}/FlameGraph/stackcollapse-perf.pl | swift-demangle | ${SCRIPT_DIR}/FlameGraph/flamegraph.pl > flamegraph.${FIRST_APP_PID}.svg
+    PERF_CMD='perf script'
+    if [ $PROFILER = 'flame-all' ]; then
+        PERF_CMD='sudo perf script'
+    fi
+    $PERF_CMD | ${SCRIPT_DIR}/FlameGraph/stackcollapse-perf.pl | swift-demangle | ${SCRIPT_DIR}/FlameGraph/flamegraph.pl > flamegraph.${FIRST_APP_PID}.svg
     ;;
   perf-idle)
     sudo perf inject -v -s -i perf.data.raw -o perf.data
