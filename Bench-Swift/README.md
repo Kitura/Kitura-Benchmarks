@@ -140,6 +140,8 @@ To enable, set environment variable PROFILER to one of the following:
 - `perf-cg` - two reports are generated: a flat profile, and a detailed call graph.
 - `perf-idle` - profiles scheduler to get insight into why the application is idle (requires sudo)
   - this is experimental and requires kernel debug symbols installed to `/usr/lib/debug/boot/vmlinux-'uname -r'`
+- `flame` - runs a perf call graph profile of the application only, and then generates a [Flame Graph](https://medium.com/@ianpartridge/flame-graphs-for-server-side-swift-4f0dd93be538).
+- `flame-all` - same as `flame`, but generates a profile capturing all processes, not just the application under test.
 
 ### Installing profiler prerequisites
 
