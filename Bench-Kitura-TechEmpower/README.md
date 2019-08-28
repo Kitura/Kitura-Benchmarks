@@ -1,15 +1,19 @@
 # Kitura-Bench-TechEmpower
 This project contains a number of Kitura-based implementations of the TechEmpower benchmarks using different database connectors.
 
-The benchmarks implement 5 of the 6 testcases (test 4, Fortunes, is not yet implemented). Kitura currently does not have an ORM, therefore these are considered 'raw' implementations.
+The majority of the source is a replica of https://github.com/TechEmpower/FrameworkBenchmarks/tree/master/frameworks/Swift/kitura and should be kept in sync whenever that upstream project is updated.
 
-- `TechEmpowerPsqlPool`: a work-in-progress implementation of the TechEmpower benchmarks on Kitura, using the Perfect-PostgreSQL database connector.
-- `TechEmpowerKuery`: a work-in-progress implementation of the TechEmpower benchmarks on Kitura using [Swift Kuery](https://github.com/IBM-Swift/Swift-Kuery). It supports all [plugins supported by Swift Kuery](https://github.com/IBM-Swift/Swift-Kuery#list-of-plugins) which can be switched between using the `DB` environment variable, which defaults to `postgresql`.
-- `TechEmpowerKueryPostgres`: an alternate implementation of TechEmpowerKuery, which uses the Swift-Kuery-PostgreSQL connector directly rather than the full Kuery API.
-- `TechEmpowerCouch`: A CouchDB implementation of TechEmpower, using Kitura-CouchDB.
+This project implements the 6 benchmarks specified by the FrameworkBenchmarks project (https://github.com/TechEmpower/FrameworkBenchmarks/wiki/Project-Information-Framework-Tests-Overview).
+
+- `TechEmpower`: an implementation of the simple `/plaintext` and `/json` benchmarks (that do not involve DB interaction).
+- `TechEmpowerPostgres`: an implementation of the DB benchmarks on Kitura, using the Swift-Kuery-PostgreSQL database connector. There is no use of the ORM, therefore this is considered a 'raw' implementation.
+- `TechEmpowerPostgresORM`: Equivalent to `TechEmpowerPostgres`, but uses Swift-Kuery-ORM.
+- `TechEmpowerPostgresORMCodable`: Equivalent to `TechEmpowerPostgresORM`, but uses Codable routing where possible (`/db`, `/queries` and `/updates`). Fortunes uses raw routing as it is not (currently) possible to return HTML from a Codable route.
+- `TechEmpowerMongoKitten`: an alternate implementation of `TechEmpowerPostgres`, talking to MongoDB using MongoKitten.
+- `TechEmpowerCouch`: A (stale) implementation using Kitura-CouchDB. Note that CouchDB is not a DB backend that TechEmpower supports.
 
 
-The `TechEmpowerPsqlPool`, `TechEmpowerKuery` (with `DB=postgresql`) and `TechEmpowerKueryPostgres` targets requires a database, for which you can follow the steps below.
+The `TechEmpowerPostgres` (et al) targets require a database, for which you can follow the steps below.
 
 # Initial Setup
 
@@ -83,7 +87,7 @@ swiftenv install
 
 Install dependencies:
 ```
-sudo apt-get install clang libicu-dev libcurl4-openssl-dev libssl-dev libpq-dev
+sudo apt-get install libcurl4-openssl-dev libssl-dev libpq-dev
 ```
 Build the Swift applications with release optimizations:
 ```
@@ -94,7 +98,7 @@ swift build -c release
 
 In separate terminal windows, start Kitura, and then start the workload driver:
 ```
-env DB_HOST="localhost" DB_PORT="5432" .build/release/TechEmpowerPsqlPool
+env DB_HOST="localhost" DB_PORT="5432" .build/release/TechEmpowerPostgres
 wrk -c128 -t4 -d30s http://127.0.0.1:8080/db
 ```
 This example exercises the Single Database Query test against the local Postgres database.
@@ -141,6 +145,5 @@ wrk -H 'Host: localhost' -H 'Accept: text/plain,text/html;q=0.9,application/xhtm
 ```
 This runs the workload driver with 256 concurrent connections (`-c 256`). TechEmpower tests with 256, 1024, 4096 and 16384 concurrent connections.
 
-Note, TechEmpower uses HTTP Pipelining for the Plaintext test. This is implemented in a LUA script which is created by the script: https://github.com/TechEmpower/FrameworkBenchmarks/blob/master/toolset/setup/linux/client.sh
-
-At the time of writing, Kitura does not properly support HTTP pipelining; either omit the script argument (everything after `-s`) or change the number of requests pipelined (`-- 16`) to `1`.
+Note, TechEmpower uses HTTP Pipelining for the Plaintext test. This is implemented in a LUA script which can be downloaded here: 
+https://github.com/TechEmpower/FrameworkBenchmarks/blob/master/toolset/wrk/pipeline.lua
