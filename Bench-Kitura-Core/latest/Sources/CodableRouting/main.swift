@@ -19,6 +19,7 @@ import LoggerAPI
 import HeliumLogger
 import Foundation
 import KituraContracts
+import BSON
 
 Log.logger = HeliumLogger(.info)
 
@@ -35,6 +36,21 @@ let router = Router()
 
 let helloStruct = simpleStruct(value: "Hello World")
 
+// Support application/bson using OpenKitten/BSON
+extension BSONEncoder: BodyEncoder {
+    public func encode<T>(_ value: T) throws -> Data where T : Encodable {
+        let document: Document = try self.encode(value)
+        return Data(bytes: document.bytes)
+    }
+}
+extension BSONDecoder: BodyDecoder {
+    public func decode<T>(_ type: T.Type, from data: Data) throws -> T where T : Decodable {
+        let document = Document(data: data)
+        return try self.decode(type, from: document)
+    }
+}
+router.encoders[MediaType(type: .application, subType: "bson")] = { return BSONEncoder() }
+router.decoders[MediaType(type: .application, subType: "bson")] = { return BSONDecoder() }
 
 // To return a struct, must provide an integer id after the route e.g. "/getHelloId/1"
 router.get("/getHelloId") { (id: Int, completion: (simpleStruct?, RequestError?) -> Void) in

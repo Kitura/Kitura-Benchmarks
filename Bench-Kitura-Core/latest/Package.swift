@@ -5,7 +5,8 @@ import PackageDescription
 
 var benchmarkDependencies: [Target.Dependency] = [
 	.byNameItem(name: "Kitura"),
-	.byNameItem(name: "HeliumLogger")
+	.byNameItem(name: "HeliumLogger"),
+.byNameItem(name: "BSON"),
 ]
 
 let package = Package(
@@ -17,6 +18,7 @@ let package = Package(
         .package(url: "https://github.com/IBM-Swift/HeliumLogger.git", from: "1.0.0"),
         .package(url: "https://github.com/IBM-Swift/Kitura-Session.git", from: "3.0.0"),
         .package(url: "https://github.com/IBM-Swift/Kitura-Compression.git", from: "2.1.1"),
+	.package(url: "https://github.com/OpenKitten/BSON.git", from: "5.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
